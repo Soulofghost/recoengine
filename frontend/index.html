@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RecoEngine | Hybrid Personalized Recommendation & Discovery Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="reco-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <h1>Reco<span>Engine</span></h1>
+          <span class="sub">Collaborative & Content-Based Neural Recommender</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-toggle-add" class="btn btn-outline">+ Add Catalog Item</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Metric Ribbon -->
+  <section class="kpi-ribbon">
+    <div class="kpi-container">
+      <div class="kpi-cell">
+        <span class="kpi-title">Catalog Inventory</span>
+        <span class="kpi-value" id="metric-items">--</span>
+      </div>
+      <div class="kpi-cell">
+        <span class="kpi-title">Active User Profiles</span>
+        <span class="kpi-value" id="metric-users">--</span>
+      </div>
+      <div class="kpi-cell">
+        <span class="kpi-title">User Interactions Logged</span>
+        <span class="kpi-value" id="metric-interactions">--</span>
+      </div>
+      <div class="kpi-cell">
+        <span class="kpi-title">Recommendation Latency</span>
+        <span class="kpi-value highlight" id="metric-latency">-- ms</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main View -->
+  <main class="main-layout">
+    <!-- Persona & Control Bar -->
+    <section class="control-card">
+      <div class="control-row">
+        <!-- Persona Switcher -->
+        <div class="control-group">
+          <span class="label">Simulated Active User:</span>
+          <div class="persona-chips" id="persona-chips">
+            <button type="button" class="btn-persona active" data-user="alvin_ai" data-persona="AI / ML Engineer">Alvin (AI Engineer)</button>
+            <button type="button" class="btn-persona" data-user="sophia_devops" data-persona="Cloud DevOps Lead">Sophia (Cloud Lead)</button>
+            <button type="button" class="btn-persona" data-user="marcus_fintech" data-persona="FinTech Quantitative">Marcus (FinTech)</button>
+            <button type="button" class="btn-persona" data-user="cold_guest" data-persona="Guest User">New Guest (Cold-Start)</button>
+          </div>
+        </div>
+
+        <!-- Strategy Modulator -->
+        <div class="control-group">
+          <span class="label">Scoring Algorithm:</span>
+          <select id="strategy-select" class="select-ctrl">
+            <option value="HYBRID" selected>Hybrid (Collaborative + Content)</option>
+            <option value="COLLABORATIVE">Collaborative Filtering Only</option>
+            <option value="CONTENT_BASED">Content-Based Only</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personalized Recommendations Section -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h2>Recommended For You</h2>
+          <p id="reco-subtitle">Personalized feed based on your interaction history and content affinities.</p>
+        </div>
+        <button id="btn-refresh-reco" class="btn btn-secondary">↻ Refresh Feed</button>
+      </div>
+
+      <div class="recommendations-shelf" id="reco-shelf">
+        <div class="shelf-loading">Computing recommendation matrix...</div>
+      </div>
+    </section>
+
+    <!-- Catalog Explorer & Live Interaction Matrix -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h2>Full Product Catalog</h2>
+          <p>Interact with items below to dynamically reshape the user's recommendation vectors in real-time.</p>
+        </div>
+        <div class="filter-group">
+          <select id="category-filter" class="select-ctrl">
+            <option value="">All Categories</option>
+            <option value="Artificial Intelligence">Artificial Intelligence</option>
+            <option value="Cloud Architecture">Cloud Architecture</option>
+            <option value="FinTech">FinTech</option>
+            <option value="Cybersecurity">Cybersecurity</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="catalog-grid" id="catalog-grid">
+        <div class="catalog-loading">Loading catalog items...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add Item Modal -->
+  <div id="add-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add Catalog Item</h3>
+        <button id="btn-close-modal" class="btn-close">&times;</button>
+      </div>
+      <form id="add-item-form">
+        <div class="form-group">
+          <label for="item-title">Item Title</label>
+          <input type="text" id="item-title" required class="input-ctrl" placeholder="e.g. Distributed Consensus in Production">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="item-cat">Category</label>
+            <input type="text" id="item-cat" required class="input-ctrl" placeholder="e.g. Cloud Architecture">
+          </div>
+          <div class="form-group">
+            <label for="item-price">Price ($)</label>
+            <input type="number" id="item-price" step="0.01" value="49.99" class="input-ctrl">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="item-tags">Tags (comma-separated)</label>
+          <input type="text" id="item-tags" required class="input-ctrl" placeholder="e.g. distributed-systems, raft, go">
+        </div>
+        <div class="form-group">
+          <label for="item-desc">Description</label>
+          <textarea id="item-desc" rows="3" required class="input-ctrl textarea" placeholder="Brief technical summary..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-add" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save & Vectorize</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

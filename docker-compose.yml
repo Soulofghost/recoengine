@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  recoengine-recommender:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recoengine-matrix
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=RecoEngine
+      - DEBUG=False
+      - RECOENGINE_DB_PATH=/app/data/recoengine.db
+    volumes:
+      - recoengine-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  recoengine-data:
+    driver: local
